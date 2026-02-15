@@ -1,0 +1,36 @@
+version: '3'
+
+vars:
+  BIN: ai-usage-bar
+  INSTALL_DIR: "{{.HOME}}/.local/bin"
+
+tasks:
+  build:
+    desc: Build the binary
+    cmds:
+      - go build -o {{.BIN}} ./cmd/ai-usage-bar
+
+  install:
+    desc: Build and install to ~/.local/bin
+    cmds:
+      - go build -o {{.INSTALL_DIR}}/{{.BIN}} ./cmd/ai-usage-bar
+
+  run:
+    desc: Build and run
+    cmds:
+      - go run ./cmd/ai-usage-bar
+
+  dev:
+    desc: Run with go run (for development)
+    cmds:
+      - go run ./cmd/ai-usage-bar
+
+  fmt:
+    desc: Format code
+    cmds:
+      - gofmt -w .
+
+  lint:
+    desc: Run linter
+    cmds:
+      - golangci-lint run ./...
