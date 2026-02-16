@@ -4,8 +4,7 @@ A lightweight waybar module for Linux that monitors your Claude, Codex (ChatGPT)
 
 Built in Go with zero external dependencies. Catppuccin Frappe themed.
 
-<!-- screenshot placeholder -->
-<!-- <img src="screenshot.png" alt="ai-usage-bar popup screenshot" width="420" /> -->
+<img src="screenshot.jpg" alt="ai-usage-bar detail popup" width="420" />
 
 ## Install
 
