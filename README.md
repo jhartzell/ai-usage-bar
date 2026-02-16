@@ -22,6 +22,20 @@ Lightweight Linux status-bar widget for AI usage limits and spend. Shows Claude,
 
 ### Install
 
+One-liner:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jhartzell/ai-usage-bar/main/install.sh | bash
+```
+
+Pinned version example:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jhartzell/ai-usage-bar/main/install.sh | bash -s -- --version v0.1.0
+```
+
+Manual build:
+
 ```bash
 git clone git@github.com:jhartzell/ai-usage-bar.git
 cd ai-usage-bar
