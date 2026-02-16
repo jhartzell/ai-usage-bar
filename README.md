@@ -122,6 +122,11 @@ task build
 task dev
 ```
 
+## Releases
+
+- Changelog: `CHANGELOG.md`
+- GitHub releases: https://github.com/jhartzell/ai-usage-bar/releases
+
 ## License
 
 MIT
