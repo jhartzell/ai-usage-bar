@@ -63,6 +63,12 @@ func Load() []provider.Result {
 		return nil
 	}
 
+	for _, cr := range e.Results {
+		if cr.Error != "" {
+			return nil
+		}
+	}
+
 	if time.Since(e.FetchedAt) > maxAge {
 		return nil
 	}
