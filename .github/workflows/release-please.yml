@@ -22,8 +22,56 @@ jobs:
         id: release
         uses: googleapis/release-please-action@v4
         with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN != '' && secrets.RELEASE_PLEASE_TOKEN || github.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      - name: Extract release PR number
+        id: pr
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        env:
+          PR_JSON: ${{ steps.release.outputs.pr }}
+          PRS_JSON: ${{ steps.release.outputs.prs }}
+        run: |
+          set -euo pipefail
+          json="$PR_JSON"
+          if [ -z "$json" ] || [ "$json" = "null" ]; then
+            json="$PRS_JSON"
+          fi
+
+          if [ -z "$json" ] || [ "$json" = "null" ]; then
+            echo "No PR JSON output found."
+            exit 1
+          fi
+
+          number=$(echo "$json" | jq -r '(.number // .[0].number)')
+          if [ -z "$number" ] || [ "$number" = "null" ]; then
+            echo "Failed to parse PR number."
+            echo "$json"
+            exit 1
+          fi
+
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for CI and merge release PR
+        if: ${{ steps.release.outputs.prs_created == 'true' && secrets.RELEASE_PLEASE_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          pr_number="${{ steps.pr.outputs.number }}"
+
+          echo "Waiting for required checks on PR #$pr_number..."
+          gh pr checks "$pr_number" --watch --required --fail-fast
+
+          echo "Merging PR #$pr_number..."
+          gh pr merge "$pr_number" --squash --delete-branch
+
+      - name: Token note
+        if: ${{ steps.release.outputs.prs_created == 'true' && secrets.RELEASE_PLEASE_TOKEN == '' }}
+        run: |
+          echo "Release PR was created/updated, but auto-merge is disabled." 
+          echo "Add a fine-grained PAT as Actions secret RELEASE_PLEASE_TOKEN to enable fully automatic releases." 
 
   build-assets:
     runs-on: ubuntu-latest
