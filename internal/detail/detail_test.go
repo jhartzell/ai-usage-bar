@@ -31,6 +31,13 @@ func TestRenderHTMLEscapesUserFields(t *testing.T) {
 	}
 }
 
+func TestRenderHTMLShowsRecoverButtonWhenAuthErrorPresent(t *testing.T) {
+	html := renderHTML([]provider.Result{{Name: "Claude", Short: "!", Error: errors.New("auth expired")}})
+	if !strings.Contains(html, "ai-usage-bar://recover-auth") {
+		t.Fatalf("expected recover-auth link in HTML")
+	}
+}
+
 func TestToProviderViewClaudeCreditsLabel(t *testing.T) {
 	credits := 50.0
 	v := toProviderView(provider.Result{

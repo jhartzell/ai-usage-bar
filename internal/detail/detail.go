@@ -1,7 +1,9 @@
 package detail
 
 import (
+	"bufio"
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"html"
@@ -20,7 +22,9 @@ var popupTemplate string
 var popupHTMLTemplate = template.Must(template.New("popup").Parse(popupTemplate))
 
 type popupData struct {
-	Providers []providerView
+	Providers        []providerView
+	ShowRecoverAuth  bool
+	RecoverAuthLabel string
 }
 
 type providerView struct {
@@ -50,6 +54,18 @@ type spendView struct {
 }
 
 func ShowYad(results []provider.Result) {
+	action, err := showYadOnce(results)
+	if err != nil {
+		return
+	}
+
+	switch action {
+	case "recover-auth":
+		_ = startRecoveryInTerminal(context.Background())
+	}
+}
+
+func showYadOnce(results []provider.Result) (string, error) {
 	htmlDoc := renderHTML(results)
 	width, height := popupSize(results)
 
@@ -59,6 +75,7 @@ func ShowYad(results []provider.Result) {
 		fmt.Sprintf("--width=%d", width),
 		fmt.Sprintf("--height=%d", height),
 		"--borders=0",
+		"--print-uri",
 		"--css=window,dialog,box,frame,scrolledwindow,viewport,grid { border: 0; box-shadow: none; background: #303446; } scrollbar, scrollbar slider { min-width: 0; min-height: 0; opacity: 0; }",
 		"--user-style=html,body{margin:0;padding:0;background:#303446;overflow:hidden;}::-webkit-scrollbar{width:0;height:0;}",
 		"--hscroll-policy=never",
@@ -70,9 +87,41 @@ func ShowYad(results []provider.Result) {
 		"--class=ai-usage-detail",
 	)
 	cmd.Stdin = strings.NewReader(htmlDoc)
-	cmd.Stdout = os.Stdout
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return "", err
+	}
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+
+	actionCh := make(chan string, 1)
+	go func() {
+		s := bufio.NewScanner(stdout)
+		for s.Scan() {
+			uri := strings.TrimSpace(s.Text())
+			switch uri {
+			case "ai-usage-bar://recover-auth":
+				select {
+				case actionCh <- "recover-auth":
+				default:
+				}
+				_ = cmd.Process.Signal(os.Interrupt)
+				return
+			}
+		}
+	}()
+
+	_ = cmd.Wait()
+
+	select {
+	case action := <-actionCh:
+		return action, nil
+	default:
+		return "", nil
+	}
 }
 
 func renderHTML(results []provider.Result) string {
@@ -81,12 +130,90 @@ func renderHTML(results []provider.Result) string {
 		data.Providers = append(data.Providers, toProviderView(r))
 	}
 
+	data.ShowRecoverAuth = shouldShowRecoverAuth(results)
+	data.RecoverAuthLabel = "Recover auth"
+
 	var buf bytes.Buffer
 	if err := popupHTMLTemplate.Execute(&buf, data); err != nil {
 		return fmt.Sprintf("<html><body style=\"background:#303446;color:#e78284;font-family:monospace;padding:12px;\">failed to render detail popup: %s</body></html>", html.EscapeString(err.Error()))
 	}
 
 	return buf.String()
+}
+
+func shouldShowRecoverAuth(results []provider.Result) bool {
+	for _, r := range results {
+		if r.Short == "!" {
+			return true
+		}
+		if r.Error != nil {
+			err := strings.ToLower(r.Error.Error())
+			if strings.Contains(err, "auth") || strings.Contains(err, "expired") || strings.Contains(err, "token") {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func startRecoveryInTerminal(ctx context.Context) error {
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	if err := spawnInTerminal(ctx, exe, []string{"--recover-auth"}); err == nil {
+		return nil
+	}
+
+	// Fall back to running directly (may still open browser-based flows).
+	return exec.CommandContext(ctx, exe, "--recover-auth").Run()
+}
+
+func spawnInTerminal(ctx context.Context, exe string, args []string) error {
+	terminals := []struct {
+		name string
+		args func(cmdline string) []string
+	}{
+		{name: "foot", args: func(cmdline string) []string { return []string{"-e", "sh", "-lc", cmdline} }},
+		{name: "alacritty", args: func(cmdline string) []string { return []string{"-e", "sh", "-lc", cmdline} }},
+		{name: "kitty", args: func(cmdline string) []string { return []string{"sh", "-lc", cmdline} }},
+		{name: "wezterm", args: func(cmdline string) []string { return []string{"start", "--", "sh", "-lc", cmdline} }},
+		{name: "gnome-terminal", args: func(cmdline string) []string { return []string{"--", "sh", "-lc", cmdline} }},
+		{name: "konsole", args: func(cmdline string) []string { return []string{"-e", "sh", "-lc", cmdline} }},
+		{name: "xterm", args: func(cmdline string) []string { return []string{"-e", "sh", "-lc", cmdline} }},
+	}
+
+	cmdline := shellCmdline(exe, args)
+	for _, t := range terminals {
+		if _, err := exec.LookPath(t.name); err != nil {
+			continue
+		}
+		cmd := exec.CommandContext(ctx, t.name, t.args(cmdline)...)
+		return cmd.Start()
+	}
+
+	return fmt.Errorf("no terminal emulator found")
+}
+
+func shellCmdline(exe string, args []string) string {
+	parts := make([]string, 0, 1+len(args)+4)
+	parts = append(parts, shellQuote(exe))
+	for _, a := range args {
+		parts = append(parts, shellQuote(a))
+	}
+
+	// Keep the terminal open so users can read output.
+	parts = append(parts, ";", "echo", "\"\"", ";", "echo", shellQuote("Done. Press Enter to close."), ";", "read")
+	return strings.Join(parts, " ")
+}
+
+func shellQuote(s string) string {
+	if s == "" {
+		return "''"
+	}
+	return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'"
 }
 
 func toProviderView(r provider.Result) providerView {

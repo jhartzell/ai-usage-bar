@@ -36,6 +36,26 @@ body {
 .subtitle {
   font-size: 11px;
   color: #838ba7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.actions {
+  display: inline-flex;
+  gap: 8px;
+}
+.action {
+  font-size: 11px;
+  color: #c6d0f5;
+  text-decoration: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid #51576d;
+  background: rgba(65, 69, 89, 0.35);
+}
+.action:hover {
+  border-color: #626880;
+  background: rgba(65, 69, 89, 0.55);
 }
 .provider {
   --accent: #8caaee;
@@ -147,7 +167,15 @@ body {
 }
 </style></head><body>
 <div class="panel">
-  <div class="title-row"><span class="title">AI Usage</span><span class="subtitle">live account snapshot</span></div>
+  <div class="title-row">
+    <span class="title">AI Usage</span>
+    <span class="subtitle">
+      live account snapshot
+      {{if .ShowRecoverAuth}}
+      <span class="actions"><a class="action" href="ai-usage-bar://recover-auth">{{.RecoverAuthLabel}}</a></span>
+      {{end}}
+    </span>
+  </div>
 
   {{range .Providers}}
   <div class="provider {{.Class}}">
