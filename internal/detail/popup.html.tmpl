@@ -1,0 +1,198 @@
+<html><head><style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+body {
+  background: radial-gradient(circle at 10% 10%, #414559 0%, #303446 42%, #292c3c 100%);
+  color: #c6d0f5;
+  font-family: 'JetBrains Mono', 'JetBrainsMono Nerd Font', monospace;
+  font-size: 13px;
+  overflow: hidden;
+}
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 10px 12px 24px;
+  background: linear-gradient(180deg, #303446 0%, #2f3446 100%);
+}
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #51576d;
+}
+.title {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: #f2d5cf;
+}
+.subtitle {
+  font-size: 11px;
+  color: #838ba7;
+}
+.provider {
+  --accent: #8caaee;
+  margin-bottom: 10px;
+  padding: 9px 10px 7px;
+  border: 1px solid #51576d;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #353a4f 0%, #32374a 100%);
+}
+.provider:last-child { margin-bottom: 0; }
+.provider.claude {
+  --accent: #ca9ee6;
+  border-color: #7b5f92;
+}
+.provider.codex {
+  --accent: #a6d189;
+  border-color: #678456;
+}
+.provider.openrouter {
+  --accent: #81c8be;
+  border-color: #4f8178;
+}
+.provider-name {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.plan {
+  color: #a5adce;
+  font-weight: normal;
+  font-size: 11px;
+  margin-left: 2px;
+}
+.identity {
+  color: #b5bfe2;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.meter-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 44px 112px;
+  align-items: center;
+  margin: 4px 0;
+  gap: 8px;
+}
+.meter-label {
+  color: #a5adce;
+  font-size: 12px;
+}
+.bar-bg {
+  width: 100%;
+  height: 12px;
+  background: #414559;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 8px;
+}
+.pct {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.reset {
+  color: #838ba7;
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+}
+.kv-label {
+  color: #a5adce;
+}
+.kv-value {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.spend { color: #c6d0f5; }
+.credits { color: #a6d189; }
+.error {
+  color: #e78284;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.no-data {
+  color: #838ba7;
+  font-size: 11px;
+  margin-top: 3px;
+}
+.hint {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  color: #737994;
+  font-size: 11px;
+}
+</style></head><body>
+<div class="panel">
+  <div class="title-row"><span class="title">AI Usage</span><span class="subtitle">live account snapshot</span></div>
+
+  {{range .Providers}}
+  <div class="provider {{.Class}}">
+    <div class="provider-name">{{.Name}}{{if .Plan}} <span class="plan">({{.Plan}})</span>{{end}}</div>
+    {{if .Identity}}<div class="identity">{{.Identity}}</div>{{end}}
+
+    {{if .Error}}
+    <div class="error">{{.Error}}</div>
+    {{else}}
+      {{range .Windows}}
+      <div class="meter-row">
+        <span class="meter-label">{{.Label}}</span>
+        <div class="bar-bg"><div class="bar-fill" style="width:{{printf "%.0f" .UsedPct}}%;background:{{.Color}}"></div></div>
+        <span class="pct" style="color:{{.Color}}">{{printf "%.0f%%" .UsedPct}}</span>
+        <span class="reset">{{.Reset}}</span>
+      </div>
+      {{end}}
+
+      {{range .Spend}}
+      <div class="kv-row">
+        <span class="kv-label">{{.Label}}</span>
+        <span class="kv-value spend">${{printf "%.2f" .Amount}}</span>
+      </div>
+      {{end}}
+
+      {{if .ShowCredits}}
+      <div class="kv-row">
+        <span class="kv-label">{{.CreditsLabel}}</span>
+        <span class="kv-value credits">${{printf "%.2f" .CreditsValue}}</span>
+      </div>
+      {{end}}
+
+      {{if .NoData}}
+      <div class="no-data">No usage metrics available.</div>
+      {{end}}
+    {{end}}
+  </div>
+  {{end}}
+
+  <script>
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'q' || e.key === 'Q' || e.key === 'Escape') {
+    window.close();
+  }
+});
+  </script>
+  <div class="hint">press q to close</div>
+</div></body></html>

@@ -37,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/jhartzell/ai-usage-bar/main/install
 Manual build:
 
 ```bash
-git clone git@github.com:jhartzell/ai-usage-bar.git
+git clone https://github.com/jhartzell/ai-usage-bar.git
 cd ai-usage-bar
 go build -o ~/.local/bin/ai-usage-bar ./cmd/ai-usage-bar
 ```
