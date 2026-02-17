@@ -4,9 +4,15 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-17
+
 ### Added
 - `--recover-auth` command to run provider login flows and clear cache in one step.
 - `--clear-cache` command to remove cached usage data without manual file deletion.
+- Detail popup button to kick off auth recovery when a provider is in an auth-failed state.
+
+### Fixed
+- Detail popup close hint now matches actual behavior (Esc).
 
 ### Changed
 - Recovery guidance now prefers the single-command flow over manual steps.
