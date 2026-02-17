@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.1] - 2026-02-17
+
+### Added
+- One-line installer script (`install.sh`) with version pinning support.
+- Comprehensive regression test suite for cache, providers, popup rendering, and Waybar formatting.
+
+### Changed
+- Detail popup renderer refactored to use an embedded HTML template (`internal/detail/popup.html.tmpl`) for maintainability.
+- README install docs now include one-liner installer usage and HTTPS clone examples.
+
+### Fixed
+- Reduced risk of popup rendering regressions by moving dynamic content into structured view-model mapping with escaping.
+
 ## [0.1.0] - 2026-02-16
 
 ### Added
