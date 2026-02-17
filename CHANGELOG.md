@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0](https://github.com/jhartzell/ai-usage-bar/compare/v0.1.1...v0.2.0) (2026-02-17)
+
+
+### Features
+
+* add auth recovery and cache clear commands ([e36e317](https://github.com/jhartzell/ai-usage-bar/commit/e36e31720f64380ba9136d9021ecda1dd8d5f07f))
+* **ui:** add popup button to recover auth ([4246934](https://github.com/jhartzell/ai-usage-bar/commit/424693421f6f804154b02cb6a20a455ec43cbee3))
+
+
+### Bug Fixes
+
+* **ui:** align popup close hint with Esc behavior ([4329ef8](https://github.com/jhartzell/ai-usage-bar/commit/4329ef853ebb2b73b48701255146e4e23046241d))
+
 ## [Unreleased]
 
 ### Added
