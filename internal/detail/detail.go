@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joshhartzell/ai-usage-bar/internal/provider"
+	"github.com/jhartzell/ai-usage-bar/internal/provider"
 )
 
 //go:embed popup.html.tmpl

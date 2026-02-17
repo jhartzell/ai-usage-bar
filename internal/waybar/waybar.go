@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/joshhartzell/ai-usage-bar/internal/provider"
+	"github.com/jhartzell/ai-usage-bar/internal/provider"
 )
 
 type Output struct {

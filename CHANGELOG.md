@@ -13,6 +13,7 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 - Detail popup close hint now matches actual behavior (Esc).
+- Go install module path now matches the GitHub repository (`github.com/jhartzell/ai-usage-bar`).
 
 ### Changed
 - Recovery guidance now prefers the single-command flow over manual steps.

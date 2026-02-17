@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joshhartzell/ai-usage-bar/internal/cache"
-	"github.com/joshhartzell/ai-usage-bar/internal/detail"
-	"github.com/joshhartzell/ai-usage-bar/internal/provider"
-	"github.com/joshhartzell/ai-usage-bar/internal/recovery"
-	"github.com/joshhartzell/ai-usage-bar/internal/waybar"
+	"github.com/jhartzell/ai-usage-bar/internal/cache"
+	"github.com/jhartzell/ai-usage-bar/internal/detail"
+	"github.com/jhartzell/ai-usage-bar/internal/provider"
+	"github.com/jhartzell/ai-usage-bar/internal/recovery"
+	"github.com/jhartzell/ai-usage-bar/internal/waybar"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_PACKAGE="github.com/joshhartzell/ai-usage-bar/cmd/ai-usage-bar"
+REPO_PACKAGE="github.com/jhartzell/ai-usage-bar/cmd/ai-usage-bar"
 VERSION="latest"
 INSTALL_DIR="${AI_USAGE_BAR_INSTALL_DIR:-$HOME/.local/bin}"
 

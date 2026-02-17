@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/joshhartzell/ai-usage-bar/internal/cache"
+	"github.com/jhartzell/ai-usage-bar/internal/cache"
 )
 
 type commandExecutor interface {
