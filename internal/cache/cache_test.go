@@ -113,6 +113,28 @@ func TestLoadReturnsNilForCorruptJSON(t *testing.T) {
 	}
 }
 
+func TestClearRemovesCacheFile(t *testing.T) {
+	t.Setenv("XDG_CACHE_HOME", t.TempDir())
+
+	writeCacheEntry(t, entry{
+		FetchedAt: time.Now(),
+		Results:   []cachedResult{{Name: "Claude"}},
+	})
+
+	if err := Clear(); err != nil {
+		t.Fatalf("clear cache: %v", err)
+	}
+
+	path, err := cachePath()
+	if err != nil {
+		t.Fatalf("cachePath: %v", err)
+	}
+
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Fatalf("expected cache file removed, stat error: %v", err)
+	}
+}
+
 func writeCacheEntry(t *testing.T, e entry) {
 	t.Helper()
 

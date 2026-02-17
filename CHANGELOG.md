@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+- `--recover-auth` command to run provider login flows and clear cache in one step.
+- `--clear-cache` command to remove cached usage data without manual file deletion.
+
+### Changed
+- Recovery guidance now prefers the single-command flow over manual steps.
+
 ## [0.1.1] - 2026-02-17
 
 ### Added

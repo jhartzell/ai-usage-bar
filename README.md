@@ -112,7 +112,15 @@ Missing auth shows `?`. Auth failures show `!`.
 
 ## Auth recovery
 
-Claude and Codex tokens are automatically refreshed when possible. If a provider still shows `!`, re-auth and force refresh:
+Claude and Codex tokens are automatically refreshed when possible. If a provider still shows `!`, run:
+
+```bash
+ai-usage-bar --recover-auth
+```
+
+This runs provider login flows and clears local cache automatically.
+
+Manual fallback:
 
 ```bash
 claude login
@@ -126,6 +134,8 @@ rm ~/.cache/ai-usage-bar/cache.json
 ```bash
 ai-usage-bar          # Waybar JSON output
 ai-usage-bar --detail # popup details
+ai-usage-bar --recover-auth # provider login + cache clear
+ai-usage-bar --clear-cache  # clear cache only
 ```
 
 ## Development

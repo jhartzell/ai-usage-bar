@@ -133,3 +133,18 @@ func Save(results []provider.Result) {
 
 	os.WriteFile(path, data, 0o600)
 }
+
+// Clear removes the cache file if it exists.
+func Clear() error {
+	path, err := cachePath()
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	return nil
+}
